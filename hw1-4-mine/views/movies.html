@@ -1,0 +1,35 @@
+<!doctype HTML>
+<html>
+
+<head>
+  <title>Add Movie</title>
+</head>
+
+<body>
+  <form action="/movies" method="POST">
+    <p>Add new films</p>
+    <p>
+      Title:
+      <input type="text" name="movie[title]" value="{{movie.title}}" /> 
+      Year:
+      <input type="text" name="movie[year]" value="{{movie.year}}" /> 
+      IMDB:
+      <input type="text" name="movie[imdb]" value="{{movie.imdb}}" />
+      <input type="hidden" name="movies" value="{{movies|dump}}" />
+    </p>
+    <input type="submit" value="Submit" />
+    <div style="color: red">{{error}}</div>
+  </form>
+  <hr>
+
+  <h3>Movies</h3>
+  {% for movie in movies %}
+  <div>
+    <p>
+      <a href="{{movie.imdb}}" target="_href">{{movie.title}}</a> ({{movie.year}})
+    </p>
+  </div>
+  {% endfor %}
+</body>
+
+</html>
