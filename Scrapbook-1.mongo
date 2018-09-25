@@ -1,0 +1,46 @@
+db.companies.aggregate([
+    { $match: { "relationships.person": { $ne: null } } },
+    { $project: { relationships: 1, name: 1, _id: 0 } },
+    { $unwind: "$relationships" },
+    { $match: { "relationships.person.permalink": "eric-di-benedetto" } },
+    { $group: {
+        _id: {
+            company_name: "$name",
+            permalink: "relationships.person.permalink"
+        },
+        count: { $sum: 1 }
+    }},
+    { $group: {
+        _id: "$permalink",
+        total: { $sum: 1 }
+    }},
+])
+
+db.grades.aggregate([
+    { $unwind: "$scores" },
+    { $match: { "scores.type": { $ne: "quiz"} } },
+    { $group: {
+        _id: {
+            class_id: "$class_id",
+            student_id: "$student_id"
+        },
+        student_avg: { $avg: "$scores.score" }
+    }},
+    { $group: {
+        _id: "$_id.class_id",
+        class_avg: { $avg: "$student_avg" }
+    }},
+    { $sort: { class_avg: -1 }}
+])
+
+db.companies.aggregate([
+    { $match: { founded_year: 2004 } },
+    { $project: { _id: 0, name: 1, funding_rounds: 1, rounding_founds_size: { $size: "$funding_rounds" }}},
+    { $match: { rounding_founds_size: { $gte: 5 } } },
+    { $unwind: "$funding_rounds" },
+    { $group: {
+        _id: "$name",
+        avg_raised: { $avg: "$funding_rounds.raised_amount" }
+    }},
+    { $sort: { avg_raised: 1 }}
+]).pretty()
